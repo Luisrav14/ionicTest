@@ -2,67 +2,58 @@
   <ion-page>
     <ion-header :translucent="true">
       <ion-toolbar>
-        <ion-title align="center">Lista | </ion-title>
+        <ion-title align="center">Lista | Canciones</ion-title>
       </ion-toolbar>
     </ion-header>
-
     <ion-content :fullscreen="true">
       <ion-item-divider>
-        <ion-label>Todas las canciones</ion-label>
+        <ion-label> Todas las canciones </ion-label>
       </ion-item-divider>
-      <ion-list ref="closeSlidingItem">
-        <ion-item-sliding v-for="el in lista" :key="el.key">
+      <ion-list style="" ref="closeSlidingRef">
+        <ion-item-sliding v-for="el in list" :key="el.id">
           <ion-item>
-            <ion-label> {{ el.name }}</ion-label>
+            <ion-label>{{ el.id }}.- {{ el.name }}</ion-label>
           </ion-item>
           <ion-item-options side="end">
-            <ion-item-option @click="addFav(el), openToast(el.isFav ? 'Canción añadida a favoritos' : 'Canción eliminada de favoritos')">
-              <ion-icon v-if="el.isFav" name="heart"></ion-icon>
+            <ion-item-option @click="addFav(el)">
+              <ion-icon v-if="this.myFavs.find((item) => item.id == el.id)" name="heart"></ion-icon>
               <ion-icon v-else name="heart-outline"></ion-icon>
             </ion-item-option>
           </ion-item-options>
         </ion-item-sliding>
       </ion-list>
-
-      <ion-item-divider v-if="!!myFavorites[0]">
-        <ion-label>Canciones favoritas</ion-label>
+      <ion-item-divider>
+        <ion-label>Canciones Favoritas</ion-label>
       </ion-item-divider>
-
-      <ion-list>
-        <ion-item v-for="el in myFavorites" :key="el.key">
+      <ion-list style="margin-buttom: 2em" ref="">
+        <ion-item-sliding v-for="fav in myFavs" :key="fav.id">
           <ion-item>
-            <ion-label> {{ el }}</ion-label>
+            <ion-label>{{ fav.id }}.- {{ fav.name }}</ion-label>
           </ion-item>
-        </ion-item>
+          <ion-item-options side="end">
+            <ion-item-option @click="addFav(el)"><ion-icon name="heart"></ion-icon></ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
       </ion-list>
     </ion-content>
   </ion-page>
 </template>
 
 <script>
-import { IonPage, IonToolbar, toastController, IonContent, IonList, IonItem, IonLabel, IonTitle, IonHeader, IonItemSliding, IonItemOption, IonItemOptions, IonIcon } from "@ionic/vue";
 import { defineComponent } from "vue";
+
+import { IonItem, IonList, IonLabel } from "@ionic/vue";
 
 export default defineComponent({
   name: "ListPage",
   components: {
-    IonContent,
-    IonList,
     IonItem,
+    IonList,
     IonLabel,
-    IonTitle,
-    IonHeader,
-    IonToolbar,
-    IonPage,
-    IonItemSliding,
-    IonItemOption,
-    IonItemOptions,
-    IonIcon,
   },
-
-  data() {
+  data: function () {
     return {
-      lista: [
+      list: [
         { id: 1, name: "JGL", isFav: false },
         { id: 2, name: "Botones azules", isFav: false },
         { id: 3, name: "Side to side", isFav: false },
@@ -79,27 +70,18 @@ export default defineComponent({
         { id: 14, name: "Yonaguni", isFav: false },
         { id: 15, name: "911", isFav: false },
       ],
-      myFavorites: [],
+      myFavs: [],
     };
   },
   methods: {
     addFav: function (el) {
-      if (!el.isFav) {
-        this.myFavorites.push(el.name);
-        el.isFav = true;
+      if (!this.myFavs.find((item) => item.id == el.id)) {
+        this.myFavs.push(el);
+        console.log(el);
       } else {
-        this.myFavorites = this.myFavorites.filter((item) => item !== el.name);
-        el.isFav = false;
+        this.myFavs.find((item) => item.id == el.id);
       }
-      this.$refs.closeSlidingItem.$el.closeSlidingItems();
-    },
-
-    async openToast(msj) {
-      const toast = await toastController.create({
-        message: msj,
-        duration: 2000,
-      });
-      return toast.present();
+      this.$refs.closeSlidingRef.$el.closeSlidingItems();
     },
   },
 });
